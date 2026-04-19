@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -70,19 +72,13 @@ Route::get('/xss-demo', function () {
 
     // $comment = '<img src=x onerror="alert(\'画像でも攻撃できる\')">';
 
-// 例2: ページを改ざん
-// $comment = '<script>document.body.innerHTML = "<h1>乗っ取られました</h1>"</script>';
+    // 例2: ページを改ざん
+    // $comment = '<script>document.body.innerHTML = "<h1>乗っ取られました</h1>"</script>';
 
-// 例3: 普通のHTML（安全な使い方）
-$comment = '<strong>太字</strong>のテキスト';
+    // 例3: 普通のHTML（安全な使い方）
+    $comment = '<strong>太字</strong>のテキスト';
 
     return view('xss-demo', compact('comment'));
-});
-
-Route::get('/users', function () {
-    $users = [];
-
-    return view('users', compact('users'));
 });
 
 Route::get('/layout/home', function () {
@@ -100,3 +96,13 @@ Route::get('/layout/contact', function () {
 Route::get('/component-demo', function () {
     return view('component-demo');
 });
+
+Route::resource('users', UserController::class);
+
+// routes/web.php
+
+Route::get('/products/create', [ProductController::class, 'create']);
+Route::post('/products', [ProductController::class, 'store']);
+
+Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products', [ProductController::class, 'index']);
