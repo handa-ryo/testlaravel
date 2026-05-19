@@ -101,14 +101,6 @@ Route::resource('users', UserController::class);
 
 // routes/web.php
 
-Route::get('/products/create', [ProductController::class, 'create']);
-Route::post('/products', [ProductController::class, 'store']);
-
-Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::get('/products', [ProductController::class, 'index']);
-
-// routes/web.php
-
 Route::get('/session-test', function () {
     // セッションにデータを保存
     session(['user_name' => '太郎']);
@@ -128,3 +120,5 @@ Route::get('/session-show', function () {
     // 全てのセッションデータを表示
     dd(session()->all());
 });
+
+Route::resource('products', ProductController::class);

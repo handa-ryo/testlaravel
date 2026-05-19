@@ -4,29 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品登録</title>
+    <title>商品編集</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
         <div class="mb-6">
-            <a href="{{ route('products.index') }}"
-                class="text-blue-600 hover:underline">← 一覧に戻る</a>
+            <a href="{{ route('products.show', $product->id) }}"
+                class="text-blue-600 hover:underline">← 詳細に戻る</a>
         </div>
 
         <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">商品登録</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">商品編集</h1>
 
-            <form action="{{ route('products.store') }}" method="POST">
+            <form action="{{ route('products.update', $product->id) }}" method="POST">
                 @csrf
+                @method('PUT')
 
-                <div class="bg-blue-50 border border-blue-200 p-3 rounded mb-4">
-                    <p class="text-xs text-gray-700 mb-1"><strong>💡 @csrf とは？</strong></p>
+                <div class="bg-purple-50 border border-purple-200 p-3 rounded mb-4">
+                    <p class="text-xs text-gray-700 mb-1"><strong>💡 @method('PUT') / @method('DELETE') とは？</strong></p>
+                    <p class="text-xs text-gray-600 mb-2">
+                        HTMLの <code>
+                            <form>
+                        </code> タグは <strong>GET と POST しかサポートしていません</strong>。
+                    </p>
                     <p class="text-xs text-gray-600">
-                        <code>@csrf</code> は <strong>CSRF（クロスサイトリクエストフォージェリ）攻撃</strong>から守るためのトークンです。<br>
-                        Laravelでは、POST/PUT/DELETE リクエストを送信する全てのフォームに<strong>必須</strong>です。<br>
-                        このトークンがないと、フォーム送信時に<strong>419エラー</strong>が発生します。
+                        しかしLaravelのリソースルートは PUT や DELETE を使います。<br>
+                        <code>@method('PUT')</code> を使うと、Laravelが内部的にPUTリクエストとして扱ってくれます。<br>
+                        これを<strong>HTTPメソッドの偽装（Method Spoofing）</strong>と言います。
                     </p>
                 </div>
 
@@ -36,25 +42,12 @@
                         商品名 <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="name" id="name"
-                        value="{{ old('name') }}"
+                        value="{{ old('name', $product->name) }}"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required>
-
-                    <div class="bg-green-50 border border-green-200 p-2 rounded mt-2 text-xs">
-                        <strong>💡 old('name') とは？</strong><br>
-                        バリデーションエラーが発生した時、<strong>入力した値を保持</strong>してくれます。<br>
-                        これがないと、エラー時に全ての入力内容が消えてしまいます。
-                    </div>
-
-                    @if($errors->has('name'))
-                    <p class="text-red-500 text-sm mt-1">{{ $errors->first('name') }}</p>
-                    @endif
-
-                    <div class="bg-yellow-50 border border-yellow-200 p-2 rounded mt-2 text-xs">
-                        <strong>💡 $errors->has('name') とは？</strong><br>
-                        バリデーションエラーが発生した時のみ、エラーメッセージを表示します。<br>
-                        <code>$errors->first('name')</code> には、コントローラで設定したエラーメッセージが入ります。
-                    </div>
+                    @error('name')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- カテゴリー -->
@@ -65,10 +58,9 @@
                     <select name="category_id" id="category_id"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required>
-                        <option value="">選択してください</option>
                         @foreach ($categories as $category)
                         <option value="{{ $category->id }}"
-                            {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
                             {{ $category->name }}
                         </option>
                         @endforeach
@@ -84,7 +76,7 @@
                         価格（円） <span class="text-red-500">*</span>
                     </label>
                     <input type="number" name="price" id="price"
-                        value="{{ old('price') }}"
+                        value="{{ old('price', $product->price) }}"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required min="0">
                     @if($errors->has('price'))
@@ -98,7 +90,7 @@
                         在庫数 <span class="text-red-500">*</span>
                     </label>
                     <input type="number" name="stock" id="stock"
-                        value="{{ old('stock', 0) }}"
+                        value="{{ old('stock', $product->stock) }}"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required min="0">
                     @if($errors->has('stock'))
@@ -112,7 +104,7 @@
                         説明
                     </label>
                     <textarea name="description" id="description" rows="4"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description') }}</textarea>
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description', $product->description) }}</textarea>
                     @if($errors->has('description'))
                     <p class="text-red-500 text-sm mt-1">{{ $errors->first('description') }}</p>
                     @endif
@@ -122,7 +114,7 @@
                 <div class="mb-6">
                     <label class="flex items-center">
                         <input type="checkbox" name="is_published" value="1"
-                            {{ old('is_published', true) ? 'checked' : '' }}
+                            {{ old('is_published', $product->is_published) ? 'checked' : '' }}
                             class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                         <span class="ml-2 text-sm text-gray-700">公開する</span>
                     </label>
@@ -130,10 +122,10 @@
 
                 <div class="flex space-x-3">
                     <button type="submit"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
-                        登録
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded">
+                        更新
                     </button>
-                    <a href="{{ route('products.index') }}"
+                    <a href="{{ route('products.show', $product->id) }}"
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded inline-block">
                         キャンセル
                     </a>
