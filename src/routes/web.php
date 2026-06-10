@@ -122,6 +122,15 @@ Route::get('/session-show', function () {
     dd(session()->all());
 });
 
+// 削除済み商品一覧
+Route::get('/products/trashed', [ProductController::class, 'trashed'])->name('products.trashed');
+
+// 商品復元
+Route::patch('/products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+
+// 完全削除
+Route::delete('/products/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete');
+
 Route::resource('products', ProductController::class);
 
 Route::get('/search', [SearchController::class, 'index']);

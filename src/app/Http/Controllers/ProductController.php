@@ -12,10 +12,13 @@ class ProductController extends Controller
     public function index()
     {
         // 公開されている商品を新しい順に取得（カテゴリー情報も一緒に）
-        $products = Product::with('category')
-            ->where('is_published', true)
-            ->latest()
-            ->get();
+        $products = Product::all(); //論理削除されているデータを除いて取得
+        // $products = Product::withTrashed()->get(); //論理削除されているデータも取得
+        // $products = Product::onlyTrashed()->get(); //論理削除されているデータしか取得しない
+        // $products = Product::with('category')
+        //     ->where('is_published', true)
+        //     ->latest()
+        //     ->get();
 
         return view('products.index', compact('products'));
     }
@@ -123,5 +126,36 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', '商品を削除しました');
+    }
+
+    // 削除済み商品一覧
+    public function trashed()
+    {
+        $products = Product::onlyTrashed()
+            ->with('category')
+            ->latest('deleted_at')
+            ->paginate(10);
+
+        return view('products.trashed', compact('products'));
+    }
+
+    // 商品復元
+    public function restore($id)
+    {
+        $product = Product::onlyTrashed()->findOrFail($id);
+        $product->restore();
+
+        return redirect()->route('products.trashed')
+            ->with('success', '商品を復元しました');
+    }
+
+    // 完全削除
+    public function forceDelete($id)
+    {
+        $product = Product::onlyTrashed()->findOrFail($id);
+        $product->forceDelete();
+
+        return redirect()->route('products.trashed')
+            ->with('success', '商品を完全に削除しました');
     }
 }
