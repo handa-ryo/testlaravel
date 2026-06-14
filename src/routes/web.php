@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaginationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
@@ -134,3 +135,5 @@ Route::delete('/products/{id}/force-delete', [ProductController::class, 'forceDe
 Route::resource('products', ProductController::class);
 
 Route::get('/search', [SearchController::class, 'index']);
+
+Route::get('/pagination', [PaginationController::class, 'index']);
