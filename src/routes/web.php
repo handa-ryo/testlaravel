@@ -4,6 +4,7 @@ use App\Http\Controllers\PaginationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ImageUploadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -137,3 +138,18 @@ Route::resource('products', ProductController::class);
 Route::get('/search', [SearchController::class, 'index']);
 
 Route::get('/pagination', [PaginationController::class, 'index']);
+
+// 商品一覧
+Route::get('/image-upload/list', [ImageUploadController::class, 'index']);
+
+Route::get('/image-upload/create', [ImageUploadController::class, 'create']);  // 登録フォーム
+Route::post('/image-upload', [ImageUploadController::class, 'store']);         // 登録処理
+
+// 商品編集フォーム表示
+Route::get('/image-upload/{product}/edit', [ImageUploadController::class, 'edit']);
+
+// 商品更新
+Route::put('/image-upload/{product}', [ImageUploadController::class, 'update']);
+
+// 商品削除
+Route::delete('/image-upload/{product}', [ImageUploadController::class, 'destroy']);
